@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "534306084976",
+    "project_id": "haydi-gezek-end",
+    "storage_bucket": "haydi-gezek-end.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:534306084976:android:f5def20137027661703cb5",
+        "android_client_info": {
+          "package_name": "com.yusufkutluay.haydigezeknavigation"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCFHY38OmTkn-zt7jvVFymtgLs84rhDfng"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
