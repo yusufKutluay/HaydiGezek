@@ -45,7 +45,7 @@ import java.io.IOException
 
 class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
-    //mapsactivity
+    //mapsactivityds
 
     private lateinit var mMap: GoogleMap
     private lateinit var binding: ActivityMapsBinding
