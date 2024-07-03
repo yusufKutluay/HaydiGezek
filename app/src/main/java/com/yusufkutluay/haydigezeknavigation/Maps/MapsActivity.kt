@@ -67,7 +67,6 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
 
 
-        // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         val mapFragment = supportFragmentManager
             .findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this)
@@ -141,7 +140,6 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                                     checkedItems[index]
                                 }
 
-                                // Remove selected routes from the map and database
                                 selectedRoutes.forEach { route ->
 
                                     database
@@ -293,34 +291,6 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
             drawRoute(sortedLocations[i], sortedLocations[i + 1])
         }
     }
-/*
-    // Rotaları kaldırdıktan sonra haritayı güncelleyen metod
-    private fun updateMapAfterRemovingRoutes(rotaList: List<RotaListModel>, konum: LatLng) {
-        val myKonum = konum // Get current location
-
-        // Clear previous markers and polylines
-        mMap.clear()
-
-        // Re-add current location marker
-        mMap.addMarker(MarkerOptions().position(myKonum).title("Mevcut Konumum"))
-
-        // Sort locations and draw routes
-        val sortedLocations = rotaList.map { LatLng(it.enlemRota, it.boylamRota) }
-        sortedLocations.forEachIndexed { index, location ->
-            if (index == 0) {
-                // Add marker for the first location in the sorted list
-                mMap.addMarker(MarkerOptions().position(location).title("Mevcut Konumum"))
-            } else {
-                // Draw route between consecutive locations
-                drawRoute(sortedLocations[index - 1], location)
-            }
-        }
-
-        // Add markers for all locations (including current location)
-        addMarkers(sortedLocations + listOf(myKonum))
-    }
-
- */
 
 
 
