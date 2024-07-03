@@ -2,7 +2,6 @@ package com.yusufkutluay.haydigezeknavigation.Maps
 
 import android.Manifest
 import android.content.ContentValues.TAG
-import android.content.DialogInterface
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.location.Location
@@ -16,7 +15,11 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.google.android.gms.common.api.ApiException
-import com.google.android.gms.location.*
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationCallback
+import com.google.android.gms.location.LocationRequest
+import com.google.android.gms.location.LocationResult
+import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
@@ -36,7 +39,6 @@ import com.yusufkutluay.haydigezeknavigation.Firebase.FirestoreDatabase
 import com.yusufkutluay.haydigezeknavigation.Model.RotaListModel
 import com.yusufkutluay.haydigezeknavigation.R
 import com.yusufkutluay.haydigezeknavigation.databinding.ActivityMapsBinding
-import io.opencensus.stats.View
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -65,6 +67,8 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
         database = FirebaseFirestore.getInstance()
         auth = FirebaseAuth.getInstance()
+
+
 
 
 
