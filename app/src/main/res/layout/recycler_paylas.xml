@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <ImageView
+        android:id="@+id/imageView14"
+        android:layout_width="54dp"
+        android:layout_height="43dp"
+        android:layout_marginStart="4dp"
+        android:layout_marginTop="16dp"
+        android:tint="#6A8385"
+        app:layout_constraintEnd_toStartOf="@+id/yorumSatir"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/circle_profil" />
+
+    <TextView
+        android:id="@+id/currentUser"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="4dp"
+        android:textStyle="bold|italic"
+        app:layout_constraintBottom_toBottomOf="@+id/imageView14"
+        app:layout_constraintStart_toEndOf="@+id/imageView14"
+        app:layout_constraintTop_toTopOf="@+id/imageView14" />
+
+    <EditText
+        android:id="@+id/yorumSatir"
+        android:layout_width="282dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:background="#00FFFFFF"
+        android:clickable="false"
+        android:ems="10"
+        android:focusable="false"
+        android:gravity="top"
+        android:inputType="text|textLongMessage|textImeMultiLine|textMultiLine"
+        android:padding="5dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.496"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/currentUser"
+        app:layout_constraintVertical_bias="0.044" />
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/cardView7"
+        android:layout_width="305dp"
+        android:layout_height="169dp"
+        android:layout_marginTop="15dp"
+        app:cardCornerRadius="10dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/yorumSatir">
+
+        <ImageView
+            android:id="@+id/resim"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scaleType="centerCrop"
+            app:srcCompat="@drawable/batman" />
+    </androidx.cardview.widget.CardView>
+
+    <View
+        android:id="@+id/view7"
+        android:layout_width="350dp"
+        android:layout_height="2dp"
+        android:layout_marginTop="30dp"
+        android:background="#1B000000"
+        android:foregroundGravity="center"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/cardView7" />
+
+    <TextView
+        android:id="@+id/tarih"
+        android:layout_width="107dp"
+        android:layout_height="18dp"
+        android:textSize="12sp"
+        app:layout_constraintStart_toStartOf="@+id/currentUser"
+        app:layout_constraintTop_toBottomOf="@+id/currentUser" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

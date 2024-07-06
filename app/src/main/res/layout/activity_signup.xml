@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/white"
+    tools:context=".LoginPage.SignupActivity"
+    android:orientation="vertical">
+
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="200dp"
+        android:layout_marginTop="25dp"
+        app:srcCompat="@drawable/logo"
+        android:scaleType="centerCrop">
+
+
+    </ImageView>
+
+    <TextView
+        android:id="@+id/textView3"
+        android:layout_width="261dp"
+        android:layout_height="50dp"
+        android:layout_marginTop="260dp"
+        android:text="HEMEN ÜYE OL"
+        android:textAlignment="center"
+        android:textSize="30sp"
+        android:textStyle="bold"
+        android:layout_centerHorizontal="true"
+        />
+
+
+    <EditText
+        android:id="@+id/uyeAd"
+        android:layout_width="299dp"
+        android:layout_height="47dp"
+        android:layout_below="@+id/textView3"
+        android:layout_centerInParent="true"
+        android:layout_marginTop="10dp"
+        android:background="@drawable/edit_text_background"
+        android:ems="10"
+        android:hint="Adınızı ve soyadınızı giriniz"
+        android:inputType="textPersonName"
+        android:typeface="monospace"
+        android:textSize="15dp"
+        android:padding="14dp"
+
+        />
+
+    <EditText
+        android:id="@+id/uyeKullaniciAd"
+        android:layout_width="299dp"
+        android:layout_height="47dp"
+        android:layout_below="@id/uyeAd"
+        android:layout_centerInParent="true"
+        android:layout_marginTop="24dp"
+        android:background="@drawable/edit_text_background"
+        android:ems="10"
+        android:hint="Kullanıcı adınızı oluşturunuz"
+        android:typeface="monospace"
+        android:textSize="15dp"
+        android:inputType="text"
+        android:padding="14dp" />
+
+    <EditText
+        android:id="@+id/uyeEposta"
+        android:layout_width="299dp"
+        android:layout_height="47dp"
+        android:layout_marginTop="24dp"
+        android:layout_below="@id/uyeKullaniciAd"
+        android:layout_centerInParent="true"
+        android:background="@drawable/edit_text_background"
+        android:ems="10"
+        android:hint="E-posta adresinizi giriniz"
+        android:inputType="textEmailAddress"
+        android:typeface="monospace"
+        android:textSize="15dp"
+        android:padding="14dp"
+
+
+        />
+
+
+
+    <EditText
+        android:id="@+id/uyeSifre"
+        android:layout_width="299dp"
+        android:layout_height="47dp"
+        android:layout_marginTop="24dp"
+        android:layout_below="@id/uyeEposta"
+        android:layout_centerInParent="true"
+        android:background="@drawable/edit_text_background"
+        android:ems="10"
+        android:hint="Şifrenizi oluşturunuz"
+        android:typeface="monospace"
+        android:textSize="15dp"
+        android:inputType="text"
+        android:padding="14dp"
+        />
+
+    <Button
+        android:id="@+id/uyeButon"
+        android:layout_width="216dp"
+        android:layout_height="49dp"
+        android:layout_below="@id/uyeSifre"
+        android:layout_centerInParent="true"
+        android:layout_marginTop="24dp"
+        android:background="@drawable/sekiltext"
+        android:backgroundTint="#F1D8B6"
+        android:onClick="uyeOlBas"
+        android:text="HESAP OLUŞTUR"
+        android:textSize="20sp" />
+
+
+
+</RelativeLayout>

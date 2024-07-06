@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/homeFragment"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:icon="@drawable/home"
+        android:title="Ana Sayfa" />
+
+    <item
+        android:id="@+id/shareFragment"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:icon="@drawable/paylas"
+        android:title="Paylaş" />
+
+    <item
+        android:id="@+id/listeFragment"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:icon="@drawable/distance_24dp_f_ll1_wght400_grad0_opsz24"
+        android:title="Rota" />
+
+    <item
+        android:id="@+id/profilFragment"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:icon="@drawable/profil"
+        android:title="Profil" />
+
+
+
+
+
+
+</menu>

@@ -1,0 +1,149 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white"
+
+    tools:context=".LoginPage.LoginActivity">
+
+    <ScrollView
+        android:id="@+id/scrollView2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="50dp"
+        android:fillViewport="true">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+
+            <ImageView
+                android:id="@+id/imageView"
+                android:layout_width="match_parent"
+                android:layout_height="253dp"
+                android:scaleType="centerCrop"
+                app:srcCompat="@drawable/logo" />
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="15dp">
+
+
+                <EditText
+                    android:id="@+id/epostaKullaniciText"
+                    android:layout_width="310dp"
+                    android:layout_height="47dp"
+                    android:layout_alignParentStart="true"
+                    android:layout_alignParentEnd="true"
+                    android:layout_marginStart="45dp"
+                    android:layout_marginEnd="45dp"
+                    android:background="@drawable/edit_text_background"
+                    android:clickable="true"
+                    android:ems="10"
+                    android:focusable="true"
+                    android:hint="E-postanızı giriniz"
+                    android:inputType="textEmailAddress"
+                    android:padding="14dp"
+                    android:textSize="15dp"
+                    android:typeface="monospace" />
+
+                <RelativeLayout
+                    android:id="@+id/relativeLayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="60dp">
+
+                    <EditText
+                        android:id="@+id/sifreText"
+                        android:layout_width="310dp"
+                        android:layout_height="47dp"
+                        android:layout_alignParentStart="true"
+                        android:layout_alignParentTop="true"
+                        android:layout_alignParentEnd="true"
+                        android:layout_marginStart="45dp"
+                        android:layout_marginTop="0dp"
+                        android:layout_marginEnd="45dp"
+                        android:background="@drawable/edit_text_background"
+                        android:clickable="true"
+                        android:ems="10"
+                        android:focusable="true"
+                        android:hint="Şifrenizi giriniz"
+                        android:inputType="textPassword"
+                        android:padding="14dp"
+                        android:textSize="15dp"
+                        android:typeface="monospace">
+
+
+                    </EditText>
+
+                    <ImageButton
+                        android:id="@+id/sifreGoster"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+
+                        android:layout_alignStart="@+id/sifreText"
+                        android:layout_alignEnd="@+id/sifreText"
+                        android:layout_marginStart="255dp"
+                        android:layout_marginEnd="8dp"
+                        android:backgroundTint="#00FFFFFF"
+                        android:src="@drawable/visibiliity_of">
+
+
+                    </ImageButton>
+
+                </RelativeLayout>
+
+
+            </RelativeLayout>
+
+
+            <Button
+                android:id="@+id/girisButton"
+                android:layout_width="216dp"
+                android:layout_height="49dp"
+                android:layout_gravity="center"
+                android:layout_marginTop="30dp"
+                android:background="@drawable/sekiltext"
+                android:onClick="girisBas"
+                android:text="HAYDİ GEZEK"
+                android:textSize="20sp" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="40dp"
+                android:gravity="center"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/textView6"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Hesabın yok mu?"
+                    android:textSize="15sp" />
+
+                <TextView
+                    android:id="@+id/uyeOlmaYazisi"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="20dp"
+                    android:onClick="uyeOlYazisi"
+                    android:text="Hemen bize katıl!!"
+                    android:textColor="#F1D8B6"
+                    android:textSize="15sp" />
+
+
+            </LinearLayout>
+
+
+        </LinearLayout>
+
+    </ScrollView>
+
+
+</RelativeLayout>

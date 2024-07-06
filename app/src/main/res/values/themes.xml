@@ -1,0 +1,42 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- Base application theme. -->
+
+    <style name="ShapeAppearanceOverlay.BottomRounded" parent="">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSizeBottomLeft">20dp</item>
+        <item name="cornerSizeBottomRight">20dp</item>
+        <item name="cornerSizeTopLeft">20dp</item>
+        <item name="cornerSizeTopRight">20dp</item>
+    </style>
+
+    <style name="Base.Theme.HaydiGezekNavigation" parent="Theme.Material3.DayNight.NoActionBar">
+        <!-- Customize your light theme here. -->
+        <item name="android:windowBackground">@color/white</item>
+        <item name="colorPrimary">#65000000</item>,
+        <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
+
+
+    </style>
+    <style name="BottomNavigationViewStyle" parent="Widget.MaterialComponents.BottomNavigationView">
+        <item name="itemIconSize">50dp</item>
+        <item name="itemTextAppearanceActive">@style/TextAppearance.AppCompat.Caption</item>
+        <item name="itemTextAppearanceInactive">@style/TextAppearance.AppCompat.Caption</item>
+    </style>
+
+
+
+    <style name="BottomNavigationView.Active" parent="TextAppearance.AppCompat.Small">
+        <item name="android:textSize">12sp</item> <!-- Aktif durumdaki metin boyutu -->
+    </style>
+
+    <style name="BottomNavigationView.Inactive" parent="TextAppearance.AppCompat.Small">
+        <item name="android:textSize">12sp</item> <!-- İnaktif durumdaki metin boyutu -->
+    </style>
+
+
+    <style name="Theme.HaydiGezekNavigation" parent="Base.Theme.HaydiGezekNavigation" >
+        <item name="android:windowBackground">@color/white</item>
+
+    </style>
+
+</resources>

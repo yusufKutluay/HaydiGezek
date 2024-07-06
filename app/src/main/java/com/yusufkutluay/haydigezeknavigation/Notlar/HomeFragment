@@ -1,0 +1,163 @@
+package com.yusufkutluay.haydigezeknavigation.AnaSayfaMenu
+
+import android.Manifest
+import android.content.pm.PackageManager
+import android.location.Geocoder
+import android.os.Bundle
+import androidx.fragment.app.Fragment
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.widget.ProgressBar
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
+import androidx.recyclerview.widget.LinearLayoutManager
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationServices
+import com.google.firebase.auth.FirebaseAuth
+import com.yusufkutluay.haydigezeknavigation.Adapter.RecyclerRotaAdapter
+import com.yusufkutluay.haydigezeknavigation.Adapter.RecyclerSehirler
+import com.yusufkutluay.haydigezeknavigation.Firebase.FirestoreDatabase
+import com.yusufkutluay.haydigezeknavigation.Maps.MapsClass
+import com.yusufkutluay.haydigezeknavigation.Model.RotaModel
+import com.yusufkutluay.haydigezeknavigation.R
+import com.yusufkutluay.haydigezeknavigation.databinding.FragmentHomeBinding
+import java.util.Locale
+
+class HomeFragment : Fragment() {
+
+    private lateinit var auth: FirebaseAuth
+    private lateinit var binding: FragmentHomeBinding
+    private var rotaList = ArrayList<RotaModel>()
+    private var cityName: String? = null
+    private lateinit var recylerViewAdapter: RecyclerRotaAdapter
+    private lateinit var progressBar: ProgressBar
+    private lateinit var mapsClass: MapsClass
+    private lateinit var recyclerSehirAdapter: RecyclerSehirler
+    private lateinit var fusedLocationClient: FusedLocationProviderClient
+    private val db = FirestoreDatabase()
+
+    private var cachedRotaList = ArrayList<RotaModel>()
+    private var cachedCityName: String? = null
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        auth = FirebaseAuth.getInstance()
+    }
+
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        binding = FragmentHomeBinding.inflate(inflater, container, false)
+        progressBar = binding.progressBar3
+        progressBar.visibility = View.VISIBLE
+        binding.yukleme.visibility = View.VISIBLE
+        binding.root.setBackgroundColor(resources.getColor(R.color.white))
+        return binding.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        mapsClass = MapsClass(requireContext())
+
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireContext())
+
+        if (cachedRotaList.isNotEmpty()) {
+            rotaList.clear()
+            rotaList.addAll(cachedRotaList)
+            updateRecyclerView()
+            progressBar.visibility = View.GONE
+        } else {
+            if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION)
+                == PackageManager.PERMISSION_GRANTED) {
+                fusedLocationClient.lastLocation
+                    .addOnSuccessListener { location ->
+                        if (location != null) {
+                            val latitude = location.latitude
+                            val longitude = location.longitude
+                            getCityName(latitude, longitude) { city ->
+                                city?.let {
+                                    fetchRotaData(it)
+                                    binding.textView2.text = it // textView2 güncellemesi
+                                }
+                            }
+                        }
+                    }
+            } else {
+                ActivityCompat.requestPermissions(requireActivity(),
+                    arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), 1)
+            }
+        }
+
+        db.sehir {
+            val layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
+            binding.recyclerSehirler.layoutManager = layoutManager
+            recyclerSehirAdapter = RecyclerSehirler(it)
+            binding.recyclerSehirler.adapter = recyclerSehirAdapter
+            binding.yukleme.visibility = View.GONE
+        }
+
+        println("cached " + cachedCityName)
+        // cachedCityName kontrolü ve textView2 güncellemesi
+        cachedCityName?.let {
+            binding.textView2.text = it
+        }
+    }
+
+    private fun fetchRotaData(cityName: String) {
+        db.getVeri(cityName.toLowerCase()) { dataList ->
+            if (dataList.isEmpty()) {
+                loadDefaultData()
+            } else {
+                rotaList.clear()
+                rotaList.addAll(dataList.map { RotaModel(name = it.name, url = it.urlGorsel) })
+                cachedRotaList.clear()
+                cachedRotaList.addAll(rotaList)
+                cachedCityName = cityName
+                updateRecyclerView()
+                progressBar.visibility = View.GONE
+            }
+        }
+    }
+
+    private fun loadDefaultData() {
+        db.getVeri("istanbul") { dataList ->
+            rotaList.clear()
+            rotaList.addAll(dataList.map { RotaModel(name = it.name, url = it.urlGorsel) })
+            cachedRotaList.clear()
+            cachedRotaList.addAll(rotaList)
+            cachedCityName = "istanbul"
+            updateRecyclerView()
+            progressBar.visibility = View.GONE
+            binding.textView2.text = "İstanbul" // textView2 güncellemesi
+        }
+    }
+
+    private fun getCityName(latitude: Double, longitude: Double, callback: (String?) -> Unit) {
+        val geocoder = Geocoder(requireContext(), Locale.getDefault())
+        val addresses = geocoder.getFromLocation(latitude, longitude, 1)
+        if (addresses!!.isNotEmpty()) {
+            val cityName = addresses[0].adminArea
+            binding.textView2.text = cityName
+            callback(cityName)
+        } else {
+            callback(null)
+        }
+    }
+
+    private fun updateRecyclerView() {
+        val layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
+        binding.recyclerRotalar.layoutManager = layoutManager
+        recylerViewAdapter = RecyclerRotaAdapter(rotaList)
+        binding.recyclerRotalar.adapter = recylerViewAdapter
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        cachedRotaList.clear()
+        cachedRotaList.addAll(rotaList)
+        cachedCityName = cityName
+    }
+}

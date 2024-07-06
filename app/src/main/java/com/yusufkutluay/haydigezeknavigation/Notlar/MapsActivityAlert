@@ -1,0 +1,288 @@
+package com.yusufkutluay.haydigezeknavigation.Maps
+
+import android.Manifest
+import android.content.DialogInterface
+import android.content.Intent
+import android.content.pm.PackageManager
+import android.location.Location
+import android.location.LocationManager
+import android.os.Bundle
+import android.provider.Settings
+import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
+import com.google.android.gms.common.api.ApiException
+import com.google.android.gms.location.*
+import com.google.android.gms.maps.CameraUpdateFactory
+import com.google.android.gms.maps.GoogleMap
+import com.google.android.gms.maps.OnMapReadyCallback
+import com.google.android.gms.maps.SupportMapFragment
+import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.LatLngBounds
+import com.google.android.gms.maps.model.MarkerOptions
+import com.google.android.gms.maps.model.PolylineOptions
+import com.google.maps.DirectionsApi
+import com.google.maps.GeoApiContext
+import com.google.maps.model.TravelMode
+import com.yusufkutluay.haydigezeknavigation.AlertDiaolog.Uyari
+import com.yusufkutluay.haydigezeknavigation.Firebase.FirestoreDatabase
+import com.yusufkutluay.haydigezeknavigation.Model.RotaListModel
+import com.yusufkutluay.haydigezeknavigation.R
+import com.yusufkutluay.haydigezeknavigation.databinding.ActivityMapsBinding
+import io.opencensus.stats.View
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import java.io.IOException
+
+
+class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
+
+    private lateinit var mMap: GoogleMap
+    private lateinit var binding: ActivityMapsBinding
+    private lateinit var fusedLocationClient: FusedLocationProviderClient
+    private lateinit var locationCallback: LocationCallback
+    private val db = FirestoreDatabase()
+    private var listKonum = ArrayList<RotaListModel>()
+    private var totalDistance = 0f
+    private var totalDuration = 0L
+    private var list = ArrayList<String>()
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        binding = ActivityMapsBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+
+
+
+
+        // Obtain the SupportMapFragment and get notified when the map is ready to be used.
+        val mapFragment = supportFragmentManager
+            .findFragmentById(R.id.map) as SupportMapFragment
+        mapFragment.getMapAsync(this)
+
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
+
+        val uyari = Uyari()
+        uyari.kontrolEtEthernet(this)
+
+        //alertdialog ile uyarı yapıldı ve konum kapalıysa etkinleştirme ekranı açıldı
+        if (!isLocationEnabled()) {
+            val uyariYap = AlertDialog.Builder(this)
+            uyariYap.setTitle("Uyarı")
+            uyariYap.setMessage("Lütfen konum ayarlarınızı kontrol ediniz")
+            uyariYap.setPositiveButton("Etkinleştir") { dialog, which ->
+                val intent = Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS)
+                startActivity(intent)
+            }
+
+            uyariYap.setNegativeButton("İptal") { dialog, which ->
+                dialog.dismiss()
+            }
+            uyariYap.setCancelable(false)
+            uyariYap.create().show()
+        }
+
+        locationCallback = object : LocationCallback() {
+            override fun onLocationResult(locationResult: LocationResult) {
+                locationResult.lastLocation?.let { location ->
+                    val myKonum = LatLng(location.latitude, location.longitude)
+
+                    binding.listeGoster.setOnClickListener {
+                        db.getRota { rotaList ->
+                            // Konuma göre en yakından en uzağa sırala
+                            rotaList.sortBy { calculateDistance(myKonum, LatLng(it.enlemRota, it.boylamRota)) }
+
+                            // Liste öğelerini hazırla
+                            val rotaInfoList = rotaList.mapIndexed { index, rota ->
+                                val distance = calculateDistance(myKonum, LatLng(rota.enlemRota, rota.boylamRota))
+                                "${index + 1}. ${rota.nameRota}"
+                            }.joinToString("\n")
+
+                            // AlertDialog oluştur
+                            val builder = AlertDialog.Builder(this@MapsActivity)
+                                .setTitle("Rotalar")
+                                .setMessage(rotaInfoList)
+
+                            builder.setPositiveButton("Tamam") { dialog, which ->
+                                // Optional: Handle "Tamam" button click
+                            }
+
+                            builder.setCancelable(false)
+                            builder.show()
+                        }
+                    }
+
+                    if (location.latitude == 0.0 || location.longitude == 0.0) {
+                        Toast.makeText(this@MapsActivity, "Konum bulunmadı", Toast.LENGTH_LONG).show()
+                    } else {
+                        mMap.clear() // mevcut işaretçileri temizle
+                        mMap.addMarker(MarkerOptions().position(myKonum).title("Mevcut Konumum"))
+                        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(myKonum, 16f))
+
+                        val intent = intent
+                        val selectedLocations = intent.getParcelableArrayListExtra<LatLng>("selectedLocations")
+
+                        try {
+                            if (!selectedLocations.isNullOrEmpty()) {
+                                val sortedLocations = listOf(myKonum) + selectedLocations.sortedBy {
+                                    calculateDistance(myKonum, it)
+                                }
+
+                                // Burada totalDistance ve totalDuration değerlerini sıfırlıyoruz
+                                totalDistance = 0f
+                                totalDuration = 0L
+
+                                for (i in 0 until sortedLocations.size - 1) {
+                                    drawRoute(sortedLocations[i], sortedLocations[i + 1])
+                                }
+                                addMarkers(selectedLocations + listOf(myKonum))
+                            }
+                        } catch (e: Exception) {
+                            e.printStackTrace()
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+
+    override fun onMapReady(googleMap: GoogleMap) {
+        mMap = googleMap
+
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), 1)
+        } else {
+            startLocationUpdates()
+        }
+    }
+
+    private fun isLocationEnabled(): Boolean {
+        val locationManager = getSystemService(LOCATION_SERVICE) as LocationManager
+        val gpsEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)
+        val networkEnabled = locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)
+        return gpsEnabled || networkEnabled
+    }
+
+    private fun calculateDistance(location1: LatLng, location2: LatLng): Float {
+        val result = floatArrayOf(0f)
+        Location.distanceBetween(location1.latitude, location1.longitude, location2.latitude, location2.longitude, result)
+        return result[0] / 1000 // Metreyi kilometreye çevir
+    }
+
+    private fun drawRoute(origin: LatLng, destination: LatLng) {
+        val apiKey = "AIzaSyD6KRKlUdjH7TcM3B2S13iqQtqkYqi10DU"
+
+        println("Origin : $origin Destination : $destination")
+
+        GlobalScope.launch(Dispatchers.IO) {
+            try {
+                val directionsResult = DirectionsApi.newRequest(getGeoApiContext(apiKey))
+                    .mode(TravelMode.DRIVING)
+                    .origin("${origin.latitude},${origin.longitude}")
+                    .destination("${destination.latitude},${destination.longitude}")
+                    .await()
+
+                val polylineOptions = PolylineOptions()
+                    .color(0xFF6A8385.toInt()) // Çizgi rengi
+                    .width(11f) // Çizgi kalınlığı
+
+                for (step in directionsResult.routes[0].legs[0].steps) {
+                    val points = step.polyline.decodePath()
+                    for (point in points) {
+                        polylineOptions.add(LatLng(point.lat, point.lng))
+                    }
+                }
+
+                val durationInMinutes = directionsResult.routes[0].legs[0].duration.inSeconds / 60
+
+                totalDuration += directionsResult.routes[0].legs[0].duration.inSeconds / 60
+                val formattedDuration = formatDurationToTurkish(totalDuration)
+
+                totalDistance += directionsResult.routes[0].legs[0].distance.inMeters / 1000f
+
+                val stringMesafe = String.format("%.2f", totalDistance)
+
+                launch(Dispatchers.Main) {
+                    mMap.addPolyline(polylineOptions)
+                    binding.textView9.text = "Toplam Süre : \n  ${formattedDuration}"
+                    binding.textView8.text = "Toplam Mesafe : \n ${stringMesafe} km"
+                    val bounds = LatLngBounds.builder().include(origin).include(destination).build()
+                    mMap.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds, 100))
+                }
+            } catch (e: ApiException) {
+                e.printStackTrace()
+            } catch (e: InterruptedException) {
+                e.printStackTrace()
+            } catch (e: IOException) {
+                e.printStackTrace()
+            }
+        }
+    }
+
+    fun formatDurationToTurkish(durationInMinutes: Long): String {
+        val hours = durationInMinutes / 60
+        val minutes = durationInMinutes % 60
+
+        return if (hours > 0) {
+            "${hours} saat ${minutes} dakika"
+        } else {
+            "${minutes} dakika"
+        }
+    }
+
+    private fun getGeoApiContext(apiKey: String): GeoApiContext {
+        return GeoApiContext.Builder()
+            .apiKey(apiKey)
+            .build()
+    }
+
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (requestCode == 1) {
+            if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                startLocationUpdates()
+            }
+        }
+    }
+
+    private fun startLocationUpdates() {
+        val locationRequest = LocationRequest.create().apply {
+            interval = 60000 // 1 dakika
+            //Konum güncellemelerinin alınma süresi. Burada, 60.000 milisaniye (1 dakika) olarak ayarlanmıştır.
+            fastestInterval = 5000 // 5 saniye
+            //Konum güncellemelerinin alınma süresi için minimum süre. Bu değer, 5.000 milisaniye (5 saniye) olarak belirlenmiştir.
+            priority = LocationRequest.PRIORITY_HIGH_ACCURACY
+        }
+
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+            fusedLocationClient.requestLocationUpdates(locationRequest, locationCallback, null)
+        }
+    }
+
+    private fun addMarkers(locations: List<LatLng>) {
+        for (location in locations) {
+            db.getRota {
+                listKonum = it
+
+                for (i in 0 until listKonum.size) {
+                    if (listKonum[i].enlemRota == location.latitude && listKonum[i].boylamRota == location.longitude) {
+                        val baslik = listKonum[i].nameRota
+                        mMap.addMarker(MarkerOptions().position(location).title(baslik))
+
+                        println(baslik)
+
+                        mMap.setOnMarkerClickListener {
+                            it.showInfoWindow()
+                            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(it.position, 14f))
+                            true
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
