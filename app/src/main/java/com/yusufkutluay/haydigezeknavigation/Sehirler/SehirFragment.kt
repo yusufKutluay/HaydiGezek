@@ -26,7 +26,6 @@ class SehirFragment : Fragment() {
     private lateinit var binding: FragmentSehirBinding
     private lateinit var auth: FirebaseAuth
     private lateinit var recylerViewAdapter: RecyclerAdapter
-    private var liste = ArrayList<Place>()
     private val data = FirestoreDatabase()
     var sehirName : String? = null
     private val navController by lazy { findNavController() }
@@ -55,26 +54,33 @@ class SehirFragment : Fragment() {
         kelime.replaceFirstChar { it.lowercase() }
 
         arguments?.let {
-            sehirName = it.getString("name")
-
+            sehirName = it.getString("name")?.let { name ->
+                name.replaceFirstChar { it.lowercase() }
+                    .replace('İ', 'i')
+                    .replace('ı', 'i')
+                    .replace('Ğ', 'g')
+                    .replace('ğ', 'g')
+                    .replace('Ü', 'u')
+                    .replace('ü', 'u')
+                    .replace('Ş', 's')
+                    .replace('ş', 's')
+                    .replace('Ö', 'o')
+                    .replace('ö', 'o')
+                    .replace('Ç', 'c')
+                    .replace('ç', 'c')
+            }
         }
-
-        kelime = sehirName!!
-        kelime = kelime.replaceFirstChar { it.uppercase() }
-
-        binding.sehirName.text = kelime
-
-        if (sehirName == "Sivas"){
-            sehirName = "sivas"
-        }else if (sehirName == "Diyarbakır"){
-            sehirName = "diyarbakir"
-        }else if (sehirName == "İstanbul"){
+        if (sehirName == "i̇stanbul"){
             sehirName = "istanbul"
-        }else{
-
         }
 
+        var textSehir = sehirName!!
+        textSehir = textSehir.replaceFirstChar { it.uppercase() }
+
+        binding.sehirName.text = textSehir
         println(sehirName)
+
+
         data.getVeri(sehirName!!) {
             // Fetch data from Firestore
 
@@ -97,7 +103,7 @@ class SehirFragment : Fragment() {
             navController.navigate(R.id.action_sehirFragment_to_homeFragment)
         }
 
-        
+
         requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner, object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
                 navController.navigate(R.id.action_sehirFragment_to_homeFragment)
@@ -105,7 +111,6 @@ class SehirFragment : Fragment() {
         })
 
     }
-
 
     private fun rotaEkle(view: View) {
 
